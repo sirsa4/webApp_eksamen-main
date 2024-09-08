@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// TODO: Delete
+model User {
+  id           String        @id @unique @default(uuid())
+  userId       String        @unique
+  gender       String
+  sport        String
+  meta         Meta?
+  activities   Activity[]
+  competitions Competition[]
+}
+
+model Meta {
+  id        String @id @default(uuid())
+  heartrate Int?
+  watt      Int?
+  speed     Int?
+  User      User   @relation(fields: [userId], references: [id])
+  userId    String @unique
+}
+
+//activities model which has models below inside it
+model Activity {
+  id        String     @id @unique @default(uuid())
+  date      DateTime?
+  name      String?
+  tags      String?
+  sport     String?
+  User      User?      @relation(fields: [userId], references: [id])
+  userId    String?
+  intervals Interval[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Interval {
+  id         String    @id @unique @default(uuid())
+  duration   Int
+  intensity  Int
+  Activity   Activity? @relation(fields: [activityId], references: [id])
+  activityId String?
+}
+
+//competition model. we are linking user and director
+model Competition {
+  id       String   @id @unique @default(uuid())
+  name     String   @unique
+  date     DateTime
+  location String
+  goal     String
+  sport    String
+  priority String
+  comment  String
+  User     User?    @relation(fields: [userId], references: [id])
+  userId   String?
+}
